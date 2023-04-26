@@ -2,6 +2,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.PriorityBlockingQueue;
+import java.util.*;
 
 class CallComparator implements Comparator<Call> {
 
@@ -75,6 +76,7 @@ public class Elevator {
     private int velocity; // Asuming 1 m/s
     private int capacity; // Asuming the capacity is always 1/4 of the entire building population
     private int interFloorHeight; // Asuming 3 meters
+    private int tripFloorTime = 3;
     private int N;
     private int L;
 
@@ -408,6 +410,104 @@ public class Elevator {
             }
         }
     }
+    public int knownstops()
+    {
+        int count =0;
+        for(Call fc : this.floorCalls)
+        {
+            if(this.direction == 1)
+            {
+                if(fc.getDirection()== 1 && fc.getFloor()>this.currentFloor)
+                {
+                    count++;
+                }
+            }
+            else if (this.direction == 0)
+            {
+                if(fc.getDirection()==0 && fc.getFloor()<this.currentFloor)
+                {
+                    count++;
+                }
+            }
+        }
+        for(Call cc : this.carCalls)
+        {
+            if(this.direction == 1)
+            {
+                if(cc.getDirection()== 1 && cc.getFloor()>this.currentFloor)
+                {
+                    count++;
+                }
+            }
+            else if (this.direction == 0)
+            {
+                if(cc.getDirection()==0 && cc.getFloor()<this.currentFloor)
+                {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+    public int time()
+    {
+        //System.out.println("loop");
+        int  waitingTime=0;
+        //Vector <Integer> vec = new Vector <Integer>();
+        for(Call tempcall : sequence )
+        {
+            System.out.println("\n\nDestination : ");
+            for(Call cc : this.carCalls)
+            {
+                System.out.print(cc.getFloor() + "\n");
+            }
+            System.out.println("Destinations ended : ");
+            System.out.println("Hall Calls : ");
+            for(Call fc : this.floorCalls)
+            {
+                System.out.println(fc.getFloor());
+            }
+            System.out.println("Halls calls ended");
+            System.out.println("Floor :: " + tempcall.getFloor());
+            if(this.direction == 1 )
+            {
+                
+                
+                    if(tempcall.getDirection()==1 && tempcall.getFloor()>=this.currentFloor)
+                    {
+                        waitingTime = (tempcall.getFloor() - this.currentFloor)*tripFloorTime + knownstops()*(passengerLoadingTime+passengerUnloadingTime);
+                    }
+                    else if (tempcall.getDirection()==0)
+                    {
+                        waitingTime=(2*this.N - tempcall.getFloor() - this.currentFloor)*tripFloorTime+ knownstops()*(passengerLoadingTime+passengerUnloadingTime);
+                    }
+                    else if (tempcall.getDirection()==1 && tempcall.getFloor()<this.currentFloor)
+                    {
+                        waitingTime=(2*this.N + tempcall.getFloor() - this.currentFloor - 2)*tripFloorTime+ knownstops()*(passengerLoadingTime+passengerUnloadingTime); 
+                    }
+                
+            }
+            else if(this.direction == 0 )
+            {
+                
+                
+                    if(tempcall.getDirection()==0 && tempcall.getFloor()<=this.currentFloor)
+                    {
+                        waitingTime = ( this.currentFloor- tempcall.getFloor())*tripFloorTime + knownstops()*(passengerLoadingTime+passengerUnloadingTime);
+                    }
+                    else if (tempcall.getDirection()==1)
+                    {
+                        waitingTime=(tempcall.getFloor() + this.currentFloor -2)*tripFloorTime+ knownstops()*(passengerLoadingTime+passengerUnloadingTime);
+                    }
+                    else if (tempcall.getDirection()==0 && tempcall.getFloor()>this.currentFloor)
+                    {
+                        waitingTime=(2*this.N - tempcall.getFloor() + this.currentFloor - 2)*tripFloorTime+ knownstops()*(passengerLoadingTime+passengerUnloadingTime); 
+                    }
+                
+            }
+        }
+        return waitingTime;
+    }
 
     //displaying
     private void displayElevator(){
@@ -422,6 +522,12 @@ public class Elevator {
                 System.out.printf(" %d ", i);
             }
         }
+        //System.out.println("debug :: ");
+        // for(int i=0;i<N; i++)
+        // {
+        //     // System.out.println(time());
+        // }
+        System.out.println("Waiting ti" + time());
 
         if (this.direction == 1){
             System.out.println("\n\n-->");
@@ -429,6 +535,8 @@ public class Elevator {
             System.out.println("\n\n<--");
         }
         System.out.println("------------------------------------------\n\n");
+       // System.out.println("Waiting time : ");
+
 
     }
 
@@ -587,3 +695,4 @@ public class Elevator {
         }
     }
 }
+

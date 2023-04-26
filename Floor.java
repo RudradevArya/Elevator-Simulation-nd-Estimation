@@ -7,6 +7,8 @@ public class Floor {
     LinkedBlockingQueue<Passenger> passengers; // stores passengers at this floor
     private int ID;
     private boolean DEBUG = false;
+    public int direction = 0;
+    public int randFloor;
 
     public Floor(int ID){
         this.passengers = new LinkedBlockingQueue<>();
@@ -39,12 +41,12 @@ public class Floor {
 
         String ID = UUID.randomUUID().toString(); // Create passenger ID
 
-        int randFloor = this.ID;
+         randFloor = this.ID;
 
         // If randFloor is the top floor, then the direction is always down
         // Else if randFloor is the main floor, then the direction is always up
         // Else the direction is chosen randomly
-        int direction = 0;
+        //int direction = 0;
         if(randFloor == 0) {
             direction = 1; // Direction is up
         }else if(randFloor == (numberOfFloors - 1)){
